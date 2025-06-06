@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h> // Though not strictly used in this merged version, kept for completeness if needed for future string operations
 
 // Define the node structure
 struct node {
@@ -8,7 +7,7 @@ struct node {
     struct node *next;
 };
 
-// Global head pointer for the linked list, initialized to NULL
+// Global head pointer
 struct node *head = NULL;
 
 // Function declarations
@@ -20,12 +19,12 @@ void ins_bef();
 void del_beg();
 void del_mid();
 void del_end();
-void search_node(); // New feature declaration
+void search_node();
 
 // Insert at the beginning
 void ins_beg() {
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
-    if (new_node == NULL) { // Always check if malloc was successful
+    if (new_node == NULL) {
         printf("Memory allocation failed! Unable to create new node.\n");
         return;
     }
@@ -43,7 +42,6 @@ void ins_end() {
         printf("Memory allocation failed! Unable to create new node.\n");
         return;
     }
-    struct node *ptr;
     printf("Enter the data of the new node: ");
     scanf("%d", &new_node->data);
     new_node->next = NULL;
@@ -51,7 +49,7 @@ void ins_end() {
     if (head == NULL) {
         head = new_node;
     } else {
-        ptr = head;
+        struct node *ptr = head;
         while (ptr->next != NULL) {
             ptr = ptr->next;
         }
@@ -62,7 +60,7 @@ void ins_end() {
 
 // Insert after a specified node
 void ins_aft() {
-    int pos_data; // Data of the node after which to insert
+    int pos_data;
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
     if (new_node == NULL) {
         printf("Memory allocation failed! Unable to create new node.\n");
@@ -81,7 +79,7 @@ void ins_aft() {
 
     if (ptr == NULL) {
         printf("Node with data %d not found in the list. Insertion failed.\n", pos_data);
-        free(new_node); // Free allocated memory if not inserted
+        free(new_node);
         return;
     }
 
@@ -92,12 +90,13 @@ void ins_aft() {
 
 // Insert before a specified node
 void ins_bef() {
-    int pos_data; // Data of the node before which to insert
+    int pos_data;
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
     if (new_node == NULL) {
         printf("Memory allocation failed! Unable to create new node.\n");
         return;
     }
+
     printf("Enter the data of the node before which the new node is to be inserted: ");
     scanf("%d", &pos_data);
     printf("Enter the data of the new node: ");
@@ -109,7 +108,6 @@ void ins_bef() {
         return;
     }
 
-    // Special case: inserting before the head node
     if (head->data == pos_data) {
         new_node->next = head;
         head = new_node;
@@ -131,7 +129,7 @@ void ins_bef() {
         return;
     }
 
-    new_node->next = ptr; // This is the 'preptr->next' from original dev1 logic
+    new_node->next = ptr;
     preptr->next = new_node;
     printll();
 }
@@ -149,7 +147,7 @@ void del_beg() {
     printll();
 }
 
-// Delete a specific node (by data value)
+// Delete a specific node
 void del_mid() {
     if (head == NULL) {
         printf("List is empty. Cannot delete from an empty list.\n");
@@ -160,7 +158,6 @@ void del_mid() {
     printf("Enter the data of the node to be deleted: ");
     scanf("%d", &data_to_delete);
 
-    // Special case: deleting the head node
     if (head->data == data_to_delete) {
         struct node *temp = head;
         head = head->next;
@@ -196,7 +193,6 @@ void del_end() {
         return;
     }
 
-    // If only one node
     if (head->next == NULL) {
         free(head);
         head = NULL;
@@ -206,7 +202,7 @@ void del_end() {
     }
 
     struct node *ptr = head;
-    struct node *preptr = NULL; // Keep track of the node before 'ptr'
+    struct node *preptr = NULL;
 
     while (ptr->next != NULL) {
         preptr = ptr;
@@ -227,30 +223,24 @@ void printll() {
     } else {
         printf("The list is: ");
         while (ptr != NULL) {
-            printf("%d -> ", ptr->data); // Show linked list style
+            printf("%d -> ", ptr->data);
             ptr = ptr->next;
         }
-        printf("NULL\n"); // Indicate end of list
+        printf("NULL\n");
     }
 }
 
-// New feature: Search for a node
+// Search for a node
 void search_node() {
-    struct node *ptr = head;
-    int search_data;
+    int search_data, position = 1;
     printf("Enter the data to search for: ");
     scanf("%d", &search_data);
 
-    if (head == NULL) {
-        printf("List is empty. Cannot search.\n");
-        return;
-    }
-
-    int position = 1;
+    struct node *ptr = head;
     while (ptr != NULL) {
         if (ptr->data == search_data) {
             printf("Node with data %d found at position %d.\n", search_data, position);
-            return; // Found, so exit
+            return;
         }
         ptr = ptr->next;
         position++;
@@ -258,7 +248,7 @@ void search_node() {
     printf("Node with data %d not found in the list.\n", search_data);
 }
 
-// Main menu function
+// Main menu
 int main() {
     int opt;
     while (1) {
@@ -271,7 +261,7 @@ int main() {
         printf("6. Delete a specific node\n");
         printf("7. Delete from the end\n");
         printf("8. Print the linked list\n");
-        printf("9. Search for a node\n"); // New option for searching
+        printf("9. Search for a node\n");
         printf("10. Exit\n");
 
         printf("Select an option: ");
@@ -286,7 +276,7 @@ int main() {
             case 6: del_mid(); break;
             case 7: del_end(); break;
             case 8: printll(); break;
-            case 9: search_node(); break; // Call the new search function
+            case 9: search_node(); break;
             case 10: exit(0);
             default: printf("Invalid option. Please try again.\n");
         }
