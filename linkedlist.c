@@ -1,92 +1,113 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-//sll.c
-struct node
-{
+// Define the node structure
+struct node {
     int data;
     struct node *next;
 };
 
-struct node *head = NULL; // Initialize head to NULL for an empty list initially
+// Global head pointer
+struct node *head = NULL;
 
+// Function declarations
 void printll();
+void ins_beg();
+void ins_end();
+void ins_aft();
+void ins_bef();
+void del_beg();
+void del_mid();
+void del_end();
+void search_node();
 
-void ins_beg()
-{
+// Insert at the beginning
+void ins_beg() {
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
-    if (new_node == NULL) { // Always check if malloc was successful
-        printf("Memory allocation failed!\n");
+    if (new_node == NULL) {
+        printf("Memory allocation failed! Unable to create new node.\n");
         return;
     }
-    printf("Enter the data of the new node: \n");
+    printf("Enter the data of the new node: ");
     scanf("%d", &new_node->data);
     new_node->next = head;
     head = new_node;
-
     printll();
 }
 
-void ins_aft()
-{
-    struct node *ptr, *preptr;
-    int pos_data; // Changed 'pos' to 'pos_data' for clarity (it's the data, not position)
+// Insert at the end
+void ins_end() {
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
     if (new_node == NULL) {
-        printf("Memory allocation failed!\n");
+        printf("Memory allocation failed! Unable to create new node.\n");
         return;
     }
-    printf("Enter the data of the node after which the new node is to be inserted: \n");
+    printf("Enter the data of the new node: ");
+    scanf("%d", &new_node->data);
+    new_node->next = NULL;
+
+    if (head == NULL) {
+        head = new_node;
+    } else {
+        struct node *ptr = head;
+        while (ptr->next != NULL) {
+            ptr = ptr->next;
+        }
+        ptr->next = new_node;
+    }
+    printll();
+}
+
+// Insert after a specified node
+void ins_aft() {
+    int pos_data;
+    struct node *new_node = (struct node *)malloc(sizeof(struct node));
+    if (new_node == NULL) {
+        printf("Memory allocation failed! Unable to create new node.\n");
+        return;
+    }
+
+    printf("Enter the data of the node after which the new node is to be inserted: ");
     scanf("%d", &pos_data);
-    printf("Enter the data of the new node: "); // Added newline for better formatting
+    printf("Enter the data of the new node: ");
     scanf("%d", &new_node->data);
 
-    preptr = head;
-    // Handle case where list is empty or target node is not found
-    if (preptr == NULL) {
-        printf("List is empty. Cannot insert after a node.\n");
-        free(new_node); // Free allocated memory if not inserted
-        return;
+    struct node *ptr = head;
+    while (ptr != NULL && ptr->data != pos_data) {
+        ptr = ptr->next;
     }
 
-    while (preptr != NULL && preptr->data != pos_data) // Iterate until target data is found or end of list
-    {
-        preptr = preptr->next;
-    }
-
-    if (preptr == NULL) { // Target node not found
+    if (ptr == NULL) {
         printf("Node with data %d not found in the list. Insertion failed.\n", pos_data);
         free(new_node);
         return;
     }
 
-    new_node->next = preptr->next;
-    preptr->next = new_node;
-
+    new_node->next = ptr->next;
+    ptr->next = new_node;
     printll();
 }
 
-void ins_bef()
-{
-    struct node *ptr, *preptr;
-    int pos_data; // Changed 'pos' to 'pos_data'
+// Insert before a specified node
+void ins_bef() {
+    int pos_data;
     struct node *new_node = (struct node *)malloc(sizeof(struct node));
     if (new_node == NULL) {
-        printf("Memory allocation failed!\n");
+        printf("Memory allocation failed! Unable to create new node.\n");
         return;
     }
-    printf("Enter the data of the node before which the new node is to be inserted: \n");
+
+    printf("Enter the data of the node before which the new node is to be inserted: ");
     scanf("%d", &pos_data);
-    printf("Enter the data of the newnode \n");
+    printf("Enter the data of the new node: ");
     scanf("%d", &new_node->data);
 
-    // Handle insertion before the head node
     if (head == NULL) {
         printf("List is empty. Cannot insert before a specific node.\n");
         free(new_node);
         return;
     }
+
     if (head->data == pos_data) {
         new_node->next = head;
         head = new_node;
@@ -94,172 +115,132 @@ void ins_bef()
         return;
     }
 
-    preptr = head;
-    ptr = head->next; // Start ptr from the second node
+    struct node *preptr = head;
+    struct node *ptr = head->next;
 
-    while (ptr != NULL && ptr->data != pos_data)
-    {
-        preptr = preptr->next;
+    while (ptr != NULL && ptr->data != pos_data) {
+        preptr = ptr;
         ptr = ptr->next;
     }
 
-    if (ptr == NULL) { // Target node not found
+    if (ptr == NULL) {
         printf("Node with data %d not found in the list. Insertion failed.\n", pos_data);
         free(new_node);
         return;
     }
 
-    new_node->next = preptr->next;
+    new_node->next = ptr;
     preptr->next = new_node;
     printll();
 }
 
-void ins_end()
-{
-    struct node *new_node = (struct node *)malloc(sizeof(struct node));
-    struct node *ptr;
-    if (new_node == NULL) {
-        printf("Memory allocation failed!\n");
-        return;
-    }
-    printf("Enter the data of the new node: \n");
-    scanf("%d", &new_node->data);
-    new_node->next = NULL;
-
-    if (head == NULL)
-    {
-        head = new_node;
-    }
-    else
-    {
-        ptr = head;
-        while (ptr->next != NULL)
-        {
-            ptr = ptr->next;
-        }
-        ptr->next = new_node;
-    }
-
-    printll(); // Removed 'head' as an argument for printll
-}
-
-void del_beg()
-{
-    if (head == NULL)
-    {
+// Delete from beginning
+void del_beg() {
+    if (head == NULL) {
         printf("List is empty. Cannot delete from an empty list.\n");
         return;
     }
-    struct node *ptr;
-    ptr = head;
-    head = ptr->next;
+    struct node *ptr = head;
+    head = head->next;
     free(ptr);
-
-    printll(); // Removed 'head' as an argument for printll
+    printf("Node deleted from the beginning.\n");
+    printll();
 }
 
-void del_mid()
-{
-    if(head == NULL){
+// Delete a specific node
+void del_mid() {
+    if (head == NULL) {
         printf("List is empty. Cannot delete from an empty list.\n");
         return;
     }
-    struct node *ptr, *preptr;
+
     int data_to_delete;
-    printf("Enter the data of the node to be deleted \n");
+    printf("Enter the data of the node to be deleted: ");
     scanf("%d", &data_to_delete);
 
-    // Handle deletion of the head node
     if (head->data == data_to_delete) {
-        ptr = head;
+        struct node *temp = head;
         head = head->next;
-        free(ptr);
+        free(temp);
+        printf("Node with data %d deleted.\n", data_to_delete);
         printll();
         return;
     }
 
-    preptr = head;
-    ptr = head->next; // Start ptr from the second node
+    struct node *preptr = head;
+    struct node *ptr = head->next;
 
-    while (ptr != NULL && ptr->data != data_to_delete)
-    {
-        preptr = preptr->next;
+    while (ptr != NULL && ptr->data != data_to_delete) {
+        preptr = ptr;
         ptr = ptr->next;
     }
 
-    if (ptr == NULL) { // Node not found
+    if (ptr == NULL) {
         printf("Node with data %d not found in the list. Deletion failed.\n", data_to_delete);
         return;
     }
 
     preptr->next = ptr->next;
     free(ptr);
-
+    printf("Node with data %d deleted.\n", data_to_delete);
     printll();
 }
 
-void del_end()
-{
-    if(head==NULL){
+// Delete from end
+void del_end() {
+    if (head == NULL) {
         printf("The list is empty. Cannot delete from an empty list.\n");
         return;
     }
-    // If only one node
+
     if (head->next == NULL) {
         free(head);
         head = NULL;
+        printf("Last node deleted.\n");
         printll();
         return;
     }
 
-    struct node *ptr, *preptr;
-    preptr = head;
-    ptr = preptr->next;
-    while (ptr->next != NULL)
-    {
+    struct node *ptr = head;
+    struct node *preptr = NULL;
+
+    while (ptr->next != NULL) {
+        preptr = ptr;
         ptr = ptr->next;
-        preptr = preptr->next;
     }
+
     preptr->next = NULL;
     free(ptr);
-
+    printf("Last node deleted.\n");
     printll();
 }
 
-void printll()
-{
+// Print the linked list
+void printll() {
     struct node *ptr = head;
-    if(head == NULL){
-        printf("The list is empty.\n"); // Added newline for consistent formatting
-    }
-    else{
-        printf("The list is:\n");
-        while (ptr != NULL)
-        {
-            printf("%d -> ", ptr->data); // Changed format to show linked list style
+    if (head == NULL) {
+        printf("The list is empty.\n");
+    } else {
+        printf("The list is: ");
+        while (ptr != NULL) {
+            printf("%d -> ", ptr->data);
             ptr = ptr->next;
         }
-        printf("NULL\n"); // Indicate end of list
+        printf("NULL\n");
     }
 }
 
-// New feature: Search for a node
+// Search for a node
 void search_node() {
-    struct node *ptr = head;
-    int search_data;
-    printf("Enter the data to search for: \n");
+    int search_data, position = 1;
+    printf("Enter the data to search for: ");
     scanf("%d", &search_data);
 
-    if (head == NULL) {
-        printf("List is empty. Cannot search.\n");
-        return;
-    }
-
-    int position = 1;
+    struct node *ptr = head;
     while (ptr != NULL) {
         if (ptr->data == search_data) {
             printf("Node with data %d found at position %d.\n", search_data, position);
-            return; // Found, so exit
+            return;
         }
         ptr = ptr->next;
         position++;
@@ -267,66 +248,38 @@ void search_node() {
     printf("Node with data %d not found in the list.\n", search_data);
 }
 
-int sll()
-{
+// Main menu
+int main() {
     int opt;
-    while (1)
-    {
-        printf("\n---------Operations on Linked list---------\n"); // Added newline for better spacing
-        printf("1. Insertion in the beginning\n");
-        printf("2. Insertion at the end\n");
-        printf("3. Insertion after the specified node\n");
-        printf("4. Insertion before the specified node\n");
-        printf("5. Deletion in the beginning\n");
-        printf("6. Deletion of specific node\n");
-        printf("7. Deletion at the End\n");
+    while (1) {
+        printf("\n--------- Operations on Linked List ---------\n");
+        printf("1. Insert at the beginning\n");
+        printf("2. Insert at the end\n");
+        printf("3. Insert after a specified node\n");
+        printf("4. Insert before a specified node\n");
+        printf("5. Delete from the beginning\n");
+        printf("6. Delete a specific node\n");
+        printf("7. Delete from the end\n");
         printf("8. Print the linked list\n");
-        printf("9. Search for a node\n"); // Added new option
-        printf("10. Exit\n"); // Changed exit option
+        printf("9. Search for a node\n");
+        printf("10. Exit\n");
 
-        printf("Select the operation to be performed: \n");
+        printf("Select an option: ");
         scanf("%d", &opt);
 
-        switch (opt)
-        {
-            case 1:
-                ins_beg();
-                break;
-            case 2:
-                ins_end();
-                break;
-            case 3:
-                ins_aft();
-                break;
-            case 4:
-                ins_bef();
-                break;
-            case 5:
-                del_beg();
-                break;
-            case 6:
-                del_mid();
-                break;
-            case 7:
-                del_end();
-                break;
-            case 8:
-                printll(); // Removed 'head' as an argument
-                break;
-            case 9: // New case for search
-                search_node();
-                break;
-            case 10: // Updated exit case
-                exit(0);
-                break;
-            default:
-                printf("Invalid option. Please try again.\n"); // More user-friendly message
+        switch (opt) {
+            case 1: ins_beg(); break;
+            case 2: ins_end(); break;
+            case 3: ins_aft(); break;
+            case 4: ins_bef(); break;
+            case 5: del_beg(); break;
+            case 6: del_mid(); break;
+            case 7: del_end(); break;
+            case 8: printll(); break;
+            case 9: search_node(); break;
+            case 10: exit(0);
+            default: printf("Invalid option. Please try again.\n");
         }
     }
-    return 0;
-}
-
-int main() {
-    sll();
     return 0;
 }
